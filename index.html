@@ -1,3 +1,4 @@
+<!-- Updated EduBot HTML -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,7 +46,6 @@
       border-radius: 8px;
       max-width: 75%;
       clear: both;
-      white-space: pre-wrap;
     }
 
     .user {
@@ -124,14 +124,16 @@
         }
 
         const data = await response.json();
+        console.log("Backend Response:", data); // helpful for debugging
+
         if (data.fulfillmentText) {
           appendMessage("bot", data.fulfillmentText);
         } else {
-          appendMessage("bot", "No reply received.");
+          appendMessage("bot", "Hmm, I didn’t understand that.");
         }
       } catch (err) {
         console.error("Fetch error:", err);
-        appendMessage("bot", "Sorry, I couldn't reach the server. Please try again.");
+        appendMessage("bot", "⚠️ Server unreachable. Please wait a few seconds and try again.");
       }
     }
 
@@ -139,14 +141,7 @@
       const chatBox = document.getElementById("chatBox");
       const msg = document.createElement("div");
       msg.className = `message ${sender}`;
-
-      // Format **bold**, *italic*, and line breaks
-      const formatted = text
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-        .replace(/\*(.*?)\*/g, "<em>$1</em>")
-        .replace(/\n/g, "<br>");
-
-      msg.innerHTML = formatted;
+      msg.innerText = text;
       chatBox.appendChild(msg);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
