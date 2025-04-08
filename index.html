@@ -45,6 +45,7 @@
       border-radius: 8px;
       max-width: 75%;
       clear: both;
+      white-space: pre-wrap;
     }
 
     .user {
@@ -138,7 +139,14 @@
       const chatBox = document.getElementById("chatBox");
       const msg = document.createElement("div");
       msg.className = `message ${sender}`;
-      msg.innerText = text;
+
+      // Format **bold**, *italic*, and line breaks
+      const formatted = text
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.*?)\*/g, "<em>$1</em>")
+        .replace(/\n/g, "<br>");
+
+      msg.innerHTML = formatted;
       chatBox.appendChild(msg);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
