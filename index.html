@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EduBot - Context-Aware AI Tutor</title>
 
-  <!-- Markdown Rendering -->
+  <!-- Markdown + Highlight.js -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-  <!-- Syntax Highlighting -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 
@@ -88,13 +86,6 @@
       background: #e3eaff;
       float: left;
       margin-right: 25%;
-    }
-
-    .context-indicator {
-      font-size: 0.8em;
-      color: #666;
-      margin: 8px 0;
-      text-align: center;
     }
 
     .input-group {
@@ -252,7 +243,6 @@
         chatContext = data.context;
 
         await addTypingMessage('bot', data.fulfillmentText);
-        addContextIndicator();
 
       } catch (error) {
         console.error('Error:', error);
@@ -288,6 +278,7 @@
       chatBox.appendChild(msgDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
       addBookmarkButton(msgDiv);
+
       setTimeout(() => {
         msgDiv.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
       }, 50);
@@ -318,17 +309,17 @@
         sticky.placeholder = 'Sticky note...';
         element.appendChild(sticky);
 
-        const pinBtn = element.querySelector('.bookmark-btn');
-
         marker.onclick = () => {
-          pinBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
           sticky.style.display = sticky.style.display === 'block' ? 'none' : 'block';
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         };
 
         document.getElementById('bookmarkTrack').appendChild(marker);
         bookmarks.set(element, { marker, sticky });
 
-        marker.style.top = `${(element.offsetTop / chatBox.scrollHeight) * chatBox.clientHeight}px`;
+        // Position marker vertically relative to chatBox height
+        const relativeTop = element.offsetTop / chatBox.scrollHeight;
+        marker.style.top = `${relativeTop * chatBox.clientHeight}px`;
       }
     }
 
@@ -353,13 +344,6 @@
       a.download = 'edubot-chat.txt';
       a.click();
       URL.revokeObjectURL(url);
-    }
-
-    function addContextIndicator() {
-      const indicator = document.createElement('div');
-      indicator.className = 'context-indicator';
-      indicator.textContent = `I'm remembering ${chatContext.length / 2} previous exchanges`;
-      chatBox.appendChild(indicator);
     }
 
     function changeTheme() {
