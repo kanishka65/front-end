@@ -288,8 +288,6 @@
       chatBox.appendChild(msgDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
       addBookmarkButton(msgDiv);
-
-      // Highlight code
       setTimeout(() => {
         msgDiv.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
       }, 50);
@@ -320,8 +318,10 @@
         sticky.placeholder = 'Sticky note...';
         element.appendChild(sticky);
 
+        const pinBtn = element.querySelector('.bookmark-btn');
+
         marker.onclick = () => {
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          pinBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
           sticky.style.display = sticky.style.display === 'block' ? 'none' : 'block';
         };
 
