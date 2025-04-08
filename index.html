@@ -4,6 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EduBot - Context-Aware AI Tutor</title>
+
+  <!-- Markdown Rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- Syntax Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -173,6 +181,17 @@
     .fun-mode {
       background: #ffe4e1 !important;
     }
+
+    pre {
+      background: #f0f0f0;
+      padding: 10px;
+      overflow-x: auto;
+      border-radius: 6px;
+    }
+
+    code {
+      font-family: monospace;
+    }
   </style>
 </head>
 <body>
@@ -248,49 +267,33 @@
     function addMessage(sender, text, isSystem = false) {
       const msgDiv = document.createElement('div');
       msgDiv.className = `message ${sender}`;
-      msgDiv.textContent = text;
+      msgDiv.innerHTML = marked.parse(text);
       if (isSystem) msgDiv.style.fontStyle = 'italic';
       chatBox.appendChild(msgDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
-      if (sender === 'bot') addBookmarkButton(msgDiv);
+      if (sender === 'bot') {
+        addBookmarkButton(msgDiv);
+        setTimeout(() => {
+          msgDiv.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+        }, 50);
+      }
       return msgDiv;
     }
 
     async function addTypingMessage(sender, text) {
       const msgDiv = document.createElement('div');
       msgDiv.className = `message ${sender}`;
-      const contentSpan = document.createElement('span');
-      msgDiv.appendChild(contentSpan);
+      const contentDiv = document.createElement('div');
+      contentDiv.innerHTML = marked.parse(text);
+      msgDiv.appendChild(contentDiv);
       chatBox.appendChild(msgDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
       addBookmarkButton(msgDiv);
 
-      const parts = text.split(/(?<=[.!?])\s+/).filter(p => p.trim());
-      if (parts.length === 0) parts.push(text);
-
-      for (const [index, part] of parts.entries()) {
-        await typeText(contentSpan, part + ' ');
-        if (index < parts.length - 1) await new Promise(r => setTimeout(r, 200));
-      }
-
-      return msgDiv;
-    }
-
-    function typeText(element, text, speed = typingSpeed) {
-      return new Promise(resolve => {
-        let i = 0;
-        const interval = setInterval(() => {
-          if (i < text.length) {
-            element.textContent += text.charAt(i);
-            const isAtBottom = Math.abs(chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight) < 5;
-            if (isAtBottom) chatBox.scrollTop = chatBox.scrollHeight;
-            i++;
-          } else {
-            clearInterval(interval);
-            resolve();
-          }
-        }, speed);
-      });
+      // Highlight code
+      setTimeout(() => {
+        msgDiv.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+      }, 50);
     }
 
     function addBookmarkButton(element) {
