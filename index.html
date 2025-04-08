@@ -44,6 +44,7 @@
     #chatBox {
       height: 60vh;
       overflow-y: auto;
+      scroll-behavior: smooth;
       padding: 20px;
       background: #f8fafc;
       border-radius: 8px;
@@ -191,6 +192,7 @@
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
     const bookmarks = new Map();
+    const typingSpeed = 5; // 🎯 Faster typing speed
 
     addMessage('bot', "I can remember our last 3 conversations. Ask follow-up questions!", true);
 
@@ -260,13 +262,17 @@
       return msgDiv;
     }
 
-    function typeText(element, text, speed = 20) {
+    function typeText(element, text, speed = typingSpeed) {
       return new Promise(resolve => {
         let i = 0;
         const interval = setInterval(() => {
           if (i < text.length) {
             element.textContent += text.charAt(i);
-            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Scroll only if user is near bottom
+            const isAtBottom = Math.abs(chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight) < 5;
+            if (isAtBottom) chatBox.scrollTop = chatBox.scrollHeight;
+
             i++;
           } else {
             clearInterval(interval);
