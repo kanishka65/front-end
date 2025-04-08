@@ -225,7 +225,6 @@
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
     const bookmarks = new Map();
-    const typingSpeed = 5;
 
     addMessage('bot', "I can remember our last 3 conversations. Ask follow-up questions!", true);
 
@@ -322,6 +321,7 @@
         element.appendChild(sticky);
 
         marker.onclick = () => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
           sticky.style.display = sticky.style.display === 'block' ? 'none' : 'block';
         };
 
