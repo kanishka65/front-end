@@ -51,6 +51,7 @@
       margin-bottom: 20px;
       flex: 1;
       border: 1px solid #ddd;
+      position: relative;
     }
 
     #bookmarkTrack {
@@ -145,6 +146,20 @@
       cursor: pointer;
     }
 
+    .sticky-note {
+      position: absolute;
+      right: -220px;
+      top: 0;
+      width: 200px;
+      padding: 10px;
+      background: #fffcb8;
+      border: 1px solid #e0c000;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+      white-space: pre-wrap;
+    }
+
     .dark-mode {
       background: #121212 !important;
       color: white;
@@ -170,7 +185,6 @@
 
   <div id="chatContainer">
     <h1>EduBot 🤖<br><small>Context-Aware Learning Assistant</small></h1>
-
     <div id="chatWrapper">
       <div id="chatBox">
         <div class="message bot">Hello! I'm EduBot. Ask me anything, and I'll remember our recent conversation!</div>
@@ -192,7 +206,7 @@
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
     const bookmarks = new Map();
-    const typingSpeed = 5; // 🎯 Faster typing speed
+    const typingSpeed = 5;
 
     addMessage('bot', "I can remember our last 3 conversations. Ask follow-up questions!", true);
 
@@ -268,11 +282,8 @@
         const interval = setInterval(() => {
           if (i < text.length) {
             element.textContent += text.charAt(i);
-
-            // Scroll only if user is near bottom
             const isAtBottom = Math.abs(chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight) < 5;
             if (isAtBottom) chatBox.scrollTop = chatBox.scrollHeight;
-
             i++;
           } else {
             clearInterval(interval);
@@ -294,14 +305,26 @@
     function toggleBookmark(element) {
       const isBookmarked = bookmarks.has(element);
       if (isBookmarked) {
-        bookmarks.get(element).remove();
+        const { marker, sticky } = bookmarks.get(element);
+        marker.remove();
+        sticky.remove();
         bookmarks.delete(element);
       } else {
         const marker = document.createElement('div');
         marker.className = 'bookmark-marker';
-        marker.onclick = () => { chatBox.scrollTop = element.offsetTop - 20; };
+
+        const sticky = document.createElement('textarea');
+        sticky.className = 'sticky-note';
+        sticky.placeholder = 'Sticky note...';
+        element.appendChild(sticky);
+
+        marker.onclick = () => {
+          sticky.style.display = sticky.style.display === 'block' ? 'none' : 'block';
+        };
+
         document.getElementById('bookmarkTrack').appendChild(marker);
-        bookmarks.set(element, marker);
+        bookmarks.set(element, { marker, sticky });
+
         marker.style.top = `${(element.offsetTop / chatBox.scrollHeight) * chatBox.clientHeight}px`;
       }
     }
